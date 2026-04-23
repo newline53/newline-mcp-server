@@ -13,18 +13,14 @@ describe("Config Unit Tests", () => {
   });
 
   describe("getNewlineConfig", () => {
-    it("should return default values when no environment variables are set", () => {
+    it("should throw when required environment variables are missing", () => {
       delete process.env.NEWLINE_BASE_URL;
       delete process.env.NEWLINE_HMAC_KEY;
       delete process.env.NEWLINE_PROGRAM_ID;
 
-      const config = getNewlineConfig();
-
-      expect(config).toEqual({
-        base_url: "https://sandbox.newline53.com/api/v1",
-        hmac_key: "default_hmac_key",
-        program_id: "default_program_id",
-      });
+      expect(() => getNewlineConfig()).toThrow(
+        "Missing required environment variable NEWLINE_HMAC_KEY",
+      );
     });
 
     it("should use environment variables when set", () => {
@@ -41,36 +37,30 @@ describe("Config Unit Tests", () => {
       });
     });
 
-    it("should use partial environment variables with defaults for missing ones", () => {
+    it("should throw when a required environment variable is missing even if base url is set", () => {
       process.env.NEWLINE_BASE_URL = "https://partial.example.com/api/v1";
       delete process.env.NEWLINE_HMAC_KEY;
       process.env.NEWLINE_PROGRAM_ID = "partial_program_id";
 
-      const config = getNewlineConfig();
-
-      expect(config).toEqual({
-        base_url: "https://partial.example.com/api/v1",
-        hmac_key: "default_hmac_key",
-        program_id: "partial_program_id",
-      });
+      expect(() => getNewlineConfig()).toThrow(
+        "Missing required environment variable NEWLINE_HMAC_KEY",
+      );
     });
 
-    it("should handle empty string environment variables (falsy, so use defaults)", () => {
+    it("should reject empty string environment variables", () => {
       process.env.NEWLINE_BASE_URL = "";
       process.env.NEWLINE_HMAC_KEY = "";
       process.env.NEWLINE_PROGRAM_ID = "";
 
-      const config = getNewlineConfig();
-
-      // Empty strings are falsy in JavaScript, so the || operator falls back to defaults
-      expect(config).toEqual({
-        base_url: "https://sandbox.newline53.com/api/v1",
-        hmac_key: "default_hmac_key",
-        program_id: "default_program_id",
-      });
+      expect(() => getNewlineConfig()).toThrow(
+        "Missing required environment variable NEWLINE_HMAC_KEY",
+      );
     });
 
     it("should return proper TypeScript interface type", () => {
+      process.env.NEWLINE_HMAC_KEY = "typed_hmac_key";
+      process.env.NEWLINE_PROGRAM_ID = "typed_program_id";
+
       const config = getNewlineConfig();
 
       expect(typeof config.base_url).toBe("string");

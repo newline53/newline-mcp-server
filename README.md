@@ -183,7 +183,6 @@ The server exposes 35+ [MCP tools](https://modelcontextprotocol.io/docs/concepts
 
 | Resource | Tool | Description |
 |----------|------|-------------|
-| **Authentication** | `get-newline-auth-token` | Retrieve current authentication token |
 | **Synthetic Accounts** | `get-synthetic-account-types` | List all available account types |
 | | `get-synthetic-accounts` | List all synthetic accounts |
 | | `get-synthetic-account` | Get details of a specific account |
@@ -218,6 +217,64 @@ The server exposes 35+ [MCP tools](https://modelcontextprotocol.io/docs/concepts
 | | `get-combined-transfer` | Get details of a specific combined transfer |
 | **Customer Activities** | `list-customer-activities` | List all customer activities |
 | | `get-customer-activity` | Get details of a specific customer activity |
+
+## Skills
+
+This server ships with ten bundled **agent skills** in the `skills/` directory. Skills are
+workflow guides that an AI agent loads on-demand to execute common multi-step banking
+operations correctly — they encode the right sequence of tool calls, required parameters,
+and decision logic for each scenario so you don't have to prompt the agent from scratch.
+
+The first six are focused task skills; the additional four are broader, reusable workflow
+skills adapted for general Agent Skills compatible harnesses such as Pi, Claude Code, and
+OpenAI Codex.
+
+For installation and usage guidance across different agent harnesses, see
+[`skills/README.md`](skills/README.md).
+
+| Skill | When to use it |
+|---|---|
+| `create-transfer` | Send money, initiate a transfer, or move funds between accounts (Wire, ACH, or Instant Payment) |
+| `investigate-transfer` | Debug, trace, audit, or check the status and history of a transfer |
+| `new-account-setup` | Open, create, or provision a new synthetic account for a customer |
+| `customer-overview` | Get a full summary or profile of a customer |
+| `account-reconciliation` | Verify that balances match between the synthetic and custodial layers |
+| `return-resolution` | Handle, investigate, or understand a returned payment |
+| `managing-users-and-accounts` | Broad customer/account workflow for lookup, KYC review, pool/type selection, and synthetic account creation |
+| `making-payments` | Broad payment workflow for validating parties and creating wire, ACH, or instant payment transfers |
+| `payment-operations` | Post-payment operations workflow for failures, returns, lifecycle review, and grouped transfer analysis |
+| `transaction-reporting` | Reporting workflow for transaction history, event timelines, balance posting evidence, and audit summaries |
+
+### Compatibility
+
+Skills follow the [Agent Skills open standard](https://agentskills.io/specification) and
+work with any compatible agent harness:
+
+- **Pi** — skills in `skills/` are auto-discovered as a package; no configuration needed.
+  Force-load a skill with `/skill:<name>` (e.g. `/skill:create-transfer`).
+- **Claude Code / OpenAI Codex / other harnesses** — point your harness at the `skills/`
+  directory in its settings, or copy individual skill directories into your global skills
+  folder (e.g. `~/.agents/skills/`). These skills are plain Agent Skills directories and do
+  not rely on Pi-only metadata.
+
+### Example prompts
+
+Once your agent harness has loaded the skills, use natural language:
+
+```
+Create an ACH transfer of $250 from account A to account B
+What happened to transfer uid_abc123?
+Open a new checking account for Jane Doe
+Give me a full overview of customer john@example.com
+Reconcile synthetic account uid_xyz789
+Why was return uid_ret456 issued and what should I do?
+Walk me through setting up a customer and account for future payments
+Help me trace a payment failure from the transfer to the underlying transactions
+Show me the event timeline and ledger impact for transaction txn_456
+```
+
+The agent will automatically load the relevant skill and follow its step-by-step
+instructions using the MCP tools.
 
 ## Docker Usage
 

@@ -41,13 +41,16 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.6.1",
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "dotenv": "^16.5.0",
     "https-proxy-agent": "^7.0.6",
     "jsonwebtoken": "^9.0.3",
     "node-fetch": "^2.7.0",
     "uuid": "^11.1.0",
     "zod": "^3.24.2"
+  },
+  "overrides": {
+    "ajv": "^8.18.0"
   },
   "devDependencies": {
     "@types/dotenv": "^6.1.1",

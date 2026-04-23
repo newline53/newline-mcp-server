@@ -19,7 +19,6 @@ import ReturnsService from "./returns.js";
 import CombinedTransfersService from "./combined_transfers.js";
 import CustomerActivitiesService from "./customer_activities.js";
 import { getNewlineConfig } from "./config.js";
-const baseNewlineUrl: string = getNewlineConfig().base_url;
 
 // Create server instance
 const server = new McpServer({
@@ -29,8 +28,10 @@ const server = new McpServer({
 
 async function main() {
   const transport = new StdioServerTransport();
-  const auth = new Auth(getNewlineConfig());
+  const config = getNewlineConfig();
+  const auth = new Auth(config);
   const token = await auth.getAuthToken();
+  const baseNewlineUrl = config.base_url;
 
   // Initialize services
   const syntheticAccounts = new SyntheticAccounts(baseNewlineUrl, token);
@@ -78,21 +79,6 @@ async function main() {
   combinedTransfers.register(server);
   customerActivities.register(server);
 
-  server.tool(
-    "get-newline-auth-token",
-    "Get newline auth token",
-    {},
-    async () => {
-      return {
-        content: [
-          {
-            type: "text",
-            text: token,
-          },
-        ],
-      };
-    },
-  );
   await server.connect(transport);
   console.error("Newline MCP Server running on stdio");
 }

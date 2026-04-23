@@ -7,8 +7,18 @@ export interface NewlineConfig {
 export function getNewlineConfig(): NewlineConfig {
   const baseUrl =
     process.env.NEWLINE_BASE_URL || "https://sandbox.newline53.com/api/v1";
-  const hmacKey = process.env.NEWLINE_HMAC_KEY || "default_hmac_key";
-  const programId = process.env.NEWLINE_PROGRAM_ID || "default_program_id";
+  const hmacKey = process.env.NEWLINE_HMAC_KEY?.trim();
+  const programId = process.env.NEWLINE_PROGRAM_ID?.trim();
+
+  if (!hmacKey) {
+    throw new Error("Missing required environment variable NEWLINE_HMAC_KEY");
+  }
+
+  if (!programId) {
+    throw new Error(
+      "Missing required environment variable NEWLINE_PROGRAM_ID",
+    );
+  }
 
   return {
     base_url: baseUrl,
